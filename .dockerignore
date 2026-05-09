@@ -1,0 +1,13 @@
+.env
+.env.local
+.env.*.local
+.venv/
+venv/
+__pycache__/
+node_modules/
+frontend/dist/
+app/static/spa/
+data/
+*.db
+*.db-journal
+.git
