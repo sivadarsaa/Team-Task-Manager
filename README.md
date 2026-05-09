@@ -189,7 +189,7 @@ frontend/dist
 - Publish directory: `frontend/dist`
 - Environment variable: `VITE_API_BASE_URL=https://your-backend-domain`
 
-Per Vite’s deployment guidance, `vite preview` is only for local previewing, not production hosting.
+Per Vite's deployment guidance, `vite preview` is only for local previewing, not production hosting.
 
 ## PostgreSQL Notes
 
