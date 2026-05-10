@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from app.activity import record_activity
 from app.deps import get_current_user, get_db
-from app.enums import MembershipRole, TaskStatus, UserRole
+from app.enums import MembershipRole, TaskPriority, TaskStatus, UserRole
 from app.models import Project, ProjectMembership, Task, User
 from app.schemas import (
     MemberInvite,
@@ -412,12 +412,20 @@ def update_task(
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Assignee must be a member of the project.")
 
     original_status = task.status
+    enum_fields = {
+        "status": TaskStatus,
+        "priority": TaskPriority,
+    }
     for field, value in updates.items():
-        if isinstance(value, str):
+        enum_type = enum_fields.get(field)
+        if enum_type and isinstance(value, str):
+            value = enum_type(value)
+        elif isinstance(value, str):
             value = value.strip()
         setattr(task, field, value)
 
     if updates:
+        status_label = task.status.value if isinstance(task.status, TaskStatus) else str(task.status)
         if "status" in updates and updates["status"] != original_status:
             record_activity(
                 db,
@@ -425,7 +433,7 @@ def update_task(
                 project=task.project,
                 task=task,
                 action="task.status_updated",
-                description=f"{current_user.full_name} moved task {task.title} to {task.status.value.replace('_', ' ')}.",
+                description=f"{current_user.full_name} moved task {task.title} to {status_label.replace('_', ' ')}.",
             )
         else:
             record_activity(

@@ -50,6 +50,10 @@ class Settings(BaseSettings):
             raise ValueError("SECURE_COOKIES must be true in production.")
         if self.cookie_samesite == "none" and not self.secure_cookies:
             raise ValueError("SECURE_COOKIES must be true when COOKIE_SAMESITE is set to 'none'.")
+        if self.environment == "production" and self.cookie_samesite == "none" and not self.resolved_cors_origins:
+            raise ValueError(
+                "At least one trusted frontend origin must be configured in production when COOKIE_SAMESITE is 'none'."
+            )
         return self
 
     @property
